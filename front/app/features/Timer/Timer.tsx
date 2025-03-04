@@ -1,0 +1,76 @@
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { startTimer, stopTimer, resetTimer, tick } from "./timerSlice";
+import type { RootState } from "~/store";
+import TodoButton from "~/components/elements/todoButton";
+
+export default function Timer() {
+  const dispatch = useDispatch();
+  const { time, isRunning, isBrake } = useSelector(
+    (state: RootState) => state.timer
+  );
+
+  const [activeButton, setActiveButton] = useState<
+    "start" | "pause" | "reset" | null
+  >(null);
+
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    if (isRunning) {  
+      interval = setInterval(() => {
+        dispatch(tick());
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isRunning, dispatch]);
+
+  const getStatusLabel = () => {
+    if (isRunning) return "Running";
+    if (isBrake === "short") return "Brake (Short)";
+    if (isBrake === "long") return "Brake (Long)";
+    return "Paused";
+  };
+
+  return (
+    <div className="flex flex-col items-center space-y-4">
+      <h1 className="text-3xl font-bold">{formatTime(time)}</h1>
+      <div className="text-lg font-semibold">Status: {getStatusLabel()}</div>
+      <div className="flex space-x-4">
+        <TodoButton
+          onClick={() => {
+            setActiveButton("start");
+            dispatch(startTimer());
+          }}
+          text="▶️ Старт"
+          color={activeButton === "start" ? "green" : "gray"}
+        />
+        <TodoButton
+          onClick={() => {
+            setActiveButton("pause");
+            dispatch(stopTimer());
+          }}
+          text="⏸️ Пауза"
+          color={activeButton === "pause" ? "yellow" : "gray"}
+        />
+        <TodoButton
+          onClick={() => {
+            setActiveButton("reset");
+            dispatch(resetTimer());
+            setTimeout(() => setActiveButton(null), 1000);
+          }}
+          text="🔄 Сброс"
+          color={activeButton === "reset" ? "red" : "gray"}
+        />
+      </div>
+    </div>
+  );
+}
