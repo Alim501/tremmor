@@ -1,11 +1,14 @@
 import React, { useState } from "react";
-import { setCurrentTask } from "~/features/Timer/timerSlice";
-import type { Task } from "~/features/ToDoTasks/dto/Task";
-import { updateTask } from "~/features/ToDoTasks/taskThunks";
 import { useAppDispatch } from "~/store";
+import type { Task } from "~/features/ToDoTasks/dto/Task";
+import { deleteTask, updateTask } from "~/features/ToDoTasks/taskThunks";
+import { useNavigate } from "react-router";
 
 export function ToDoCard({ task }: { task: Task }) {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const [taskStatus, setTaskStatus] = useState<Task["status"]>(task.status);
+  const [menuOpen, setMenuOpen] = useState(false); // состояние для меню
 
   const statusColors: Record<
     "in progress" | "to do" | "done" | "canceled",
@@ -16,8 +19,6 @@ export function ToDoCard({ task }: { task: Task }) {
     done: "bg-green-500",
     canceled: "bg-red-500",
   };
-
-  const [taskStatus, setTaskStatus] = useState<Task["status"]>(task.status);
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newStatus = e.target.value as Task["status"];
@@ -31,19 +32,50 @@ export function ToDoCard({ task }: { task: Task }) {
     dispatch(updateTask(updatedTask));
   };
 
-  const handleCardClick = () => {
-    dispatch(setCurrentTask(task));
+  const handleEdit = () => {
+    navigate(`edit/${task.id}`);
+    setMenuOpen(false);
   };
 
+  const handleDelete = () => {
+    if (confirm(`Вы уверены, что хотите удалить задачу "${task.title}"?`)) {
+      dispatch(deleteTask(task.id));
+      setMenuOpen(false);
+    }
+  };
+  console.log(task.cyclesCurrent);
   return (
-    <div
-      className="max-w-sm rounded-xl overflow-hidden bg-gray-700 text-whiteF shadow-lg p-5 cursor-pointer"
-      onClick={handleCardClick}
-    >
+    <div className="relative max-w-sm rounded-xl overflow-hidden border rounded-lg shadow-sm p-5 cursor-pointer">
+      {/* Иконка троеточия */}
+      <div className="absolute top-3 right-3">
+        <button onClick={() => setMenuOpen(!menuOpen)} aria-label="Меню">
+          <div className="text-xl">⋮</div>
+        </button>
+
+        {/* Выпадающее меню */}
+        {menuOpen && (
+          <div className="absolute right-0 mt-2 w-36 bg-white text-black rounded-md shadow-lg z-50">
+            <button
+              onClick={handleEdit}
+              className="w-full text-left px-4 py-2 hover:bg-gray-100"
+            >
+              ✏️ Редактировать
+            </button>
+            <button
+              onClick={handleDelete}
+              className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600"
+            >
+              🗑️ Удалить
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Статус */}
       <select
         value={taskStatus}
         onChange={handleStatusChange}
-        className={`w-full p-2 my-1 mb-3 border rounded-md text-white ${statusColors[taskStatus]}`}
+        className={`w-full p-2 my-1 mb-5 border rounded-md ${statusColors[taskStatus]}`}
       >
         <option value="to do">To Do</option>
         <option value="in progress">In Progress</option>
@@ -51,8 +83,11 @@ export function ToDoCard({ task }: { task: Task }) {
         <option value="canceled">Canceled</option>
       </select>
 
+      {/* Основная информация */}
       <h2 className="font-bold text-xl mt-2">{task.title}</h2>
-      <h2 className="font-bold text-xl mt-2">{task.cyclesCurrent}/{task.cycles}</h2>
+      <h2 className="font-bold text-xl mt-2">
+        {task.cyclesCurrent}/{task.cycles}
+      </h2>
       <h2 className="font-bold text-xl mt-2">{task.priority?.title}</h2>
       <h2 className="font-bold text-xl mt-2">{task.category?.title}</h2>
     </div>

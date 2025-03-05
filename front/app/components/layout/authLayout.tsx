@@ -1,11 +1,13 @@
-import { Link, Outlet } from "react-router";
+import { Outlet } from "react-router";
 
-export function AuthLayout() {
+const AuthLayout = () => {
   return (
-    <main className="flex items-center justify-center pt-16 pb-4">
-      <div className="flex-1 flex flex-col items-center gap-16 min-h-0">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-96">
         <Outlet />
       </div>
-    </main>
+    </div>
   );
-}
+};
+
+export default AuthLayout;

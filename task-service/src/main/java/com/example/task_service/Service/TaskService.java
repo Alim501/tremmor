@@ -38,7 +38,7 @@ public class TaskService {
             task.setTitle(taskDetails.getTitle());
             task.setStatus(taskDetails.getStatus());
             task.setCycles(taskDetails.getCycles());
-            task.setCyclesCurrent(taskDetails.getCycles());
+            task.setCyclesCurrent(taskDetails.getCyclesCurrent());
             task.setCategory(taskDetails.getCategory());
             task.setPriority(taskDetails.getPriority());
             task.setUserId(userId);

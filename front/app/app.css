@@ -1,12 +1,12 @@
 @import "tailwindcss";
-
+@custom-variant dark (&:where(.dark, .dark *));
 html, body {
-  @apply bg-gray-300 text-black dark:bg-gray-900 dark:text-white;
-
+  @apply min-h-screen bg-gray-300 text-black transition-colors duration-300 dark:bg-gray-900 dark:text-white;
+ 
   /* Поддержка системных настроек */
-  @media (prefers-color-scheme: dark) {
+  /* @media (prefers-color-scheme: dark) {
     color-scheme: dark;
-  }
+  } */
 
   /* Добавляем плавный переход при смене темы */
   transition: background-color 0.3s, color 0.3s;

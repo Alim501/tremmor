@@ -1,14 +1,20 @@
 import { useEffect, useState } from "react";
-import TodoButton from "../elements/todoButton";
+import { useNavigate, useParams } from "react-router";
 import { useAppDispatch } from "~/store";
-import { addTask } from "~/features/ToDoTasks/taskThunks";
-import { useNavigate } from "react-router";
+import TodoButton from "../elements/todoButton";
+import { addTask, updateTask } from "~/features/ToDoTasks/taskThunks";
 import { fetchCategories } from "~/services/api/CategoryApi";
 import { fetchPriority } from "~/services/api/PriorityApi";
 import type { Category } from "~/features/ToDoTasks/dto/Category";
 import type { Priority } from "~/features/ToDoTasks/dto/Priority";
+import type { Task } from "~/features/ToDoTasks/dto/Task";
+import { getOneTask } from "~/services/api/TaskApi";
 
-export function CreateToDoTask() {
+interface CreateTaskProps {
+  taskId?: number;
+}
+
+export function CreateToDoTask({ taskId }: CreateTaskProps) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -30,38 +36,60 @@ export function CreateToDoTask() {
         const prioritiesData = await fetchPriority();
         setCategories(categoriesData);
         setPriorities(prioritiesData);
-        console.log(categories, priorities);
       } catch (error) {
         console.error("Failed to fetch categories or priorities:", error);
       }
     };
+
+    const loadTask = async () => {
+      if (taskId) {
+        try {
+          const task: Task | null = await getOneTask(taskId);
+          if (task) {
+            setTaskTitle(task.title);
+            setTaskCycles(task.cycles);
+            setTaskStatus(task.status);
+            setCategory(task.category ?? null);
+            setPriority(task.priority ?? null);
+          }
+        } catch (error) {
+          console.error("Failed to fetch task:", error);
+        }
+      }
+    };
+
     loadData();
-  }, []);
+    loadTask();
+  }, [taskId]);
 
   const handleSubmit = () => {
     if (taskTitle.trim()) {
-      dispatch(
-        addTask({
-          id: 1,
-          title: taskTitle,
-          status: taskStatus,
-          cycles: taskCycles,
-          cyclesCurrent: 0,
-          category: taskCategory,
-          priority: taskPriority,
-        })
-      );
-      setTaskTitle("");
-      setTaskCycles(0);
-      setCategory(null);
-      setPriority(null);
-      setTaskStatus("to do");
+      const newTask: Task = {
+        id: taskId ?? Date.now(), // Если id нет — создаём новый
+        title: taskTitle,
+        status: taskStatus,
+        cycles: taskCycles,
+        cyclesCurrent: taskId ? 0 : 0, // Если редактируем, можно подставить текущее значение
+        category: taskCategory,
+        priority: taskPriority,
+      };
+
+      if (taskId) {
+        dispatch(updateTask(newTask));
+      } else {
+        dispatch(addTask(newTask));
+      }
+
       navigate("/todo");
     }
   };
 
   return (
-    <div className="p-4 border rounded-lg bg-gray-950 shadow-sm">
+    <div className="p-4 border rounded-lg  shadow-sm">
+      <h2 className="text-xl font-bold mb-4">
+        {taskId ? "Edit Task" : "Create Task"}
+      </h2>
+
       <label className="block text-sm font-medium">Title</label>
       <input
         type="text"
@@ -100,7 +128,7 @@ export function CreateToDoTask() {
       >
         <option value="">Select a category</option>
         {categories.map((category) => (
-          <option key={category.id} value={category.id}>
+          <option key={category.id} value={category.id} className="bg-gray-500">
             {category.title}
           </option>
         ))}
@@ -128,13 +156,17 @@ export function CreateToDoTask() {
       >
         <option value="">Select priority</option>
         {priorities.map((priority) => (
-          <option key={priority.id} value={priority.id}>
+          <option key={priority.id} value={priority.id} className="bg-gray-500">
             {priority.title}
           </option>
         ))}
       </select>
 
-      <TodoButton text="Save Task" color="green" onClick={handleSubmit} />
+      <TodoButton
+        text={taskId ? "Update Task" : "Save Task"}
+        color="green"
+        onClick={handleSubmit}
+      />
     </div>
   );
 }

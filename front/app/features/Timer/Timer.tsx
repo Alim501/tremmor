@@ -1,12 +1,21 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { startTimer, stopTimer, resetTimer, tick } from "./timerSlice";
+import { useSelector } from "react-redux";
+import {
+  startTimer,
+  stopTimer,
+  resetTimer,
+  tick,
+  changePhase,
+} from "./timerSlice";
+import { fetchAndSetTasks, completeCycleAndUpdateTasks } from "./timerThunks";
 import type { RootState } from "~/store";
+import { useAppDispatch } from "~/store";
 import TodoButton from "~/components/elements/todoButton";
+import { fetchTasks } from "../ToDoTasks/taskThunks";
 
 export default function Timer() {
-  const dispatch = useDispatch();
-  const { time, isRunning, isBrake } = useSelector(
+  const dispatch = useAppDispatch();
+  const { time, isRunning, isBrake, tasks } = useSelector(
     (state: RootState) => state.timer
   );
 
@@ -21,24 +30,39 @@ export default function Timer() {
   };
 
   useEffect(() => {
+    dispatch(fetchAndSetTasks());
+  }, [dispatch]);
+
+  useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
-    if (isRunning) {  
+    if (isRunning) {
       interval = setInterval(() => {
         dispatch(tick());
       }, 1000);
     }
-
     return () => {
       if (interval) clearInterval(interval);
     };
   }, [isRunning, dispatch]);
 
+  useEffect(() => {
+    if (time === 0 && isBrake === "no") {
+      dispatch(completeCycleAndUpdateTasks()).then(() => {
+        dispatch(fetchTasks());
+      });
+    } else if (time === 0) {
+      dispatch(changePhase());
+    }
+  }, [time, isBrake, dispatch]);
+
   const getStatusLabel = () => {
-    if (isRunning) return "Running";
+    if (isBrake === "no") return "Running";
     if (isBrake === "short") return "Brake (Short)";
     if (isBrake === "long") return "Brake (Long)";
     return "Paused";
   };
+
+  console.log(time, isRunning, isBrake, tasks);
 
   return (
     <div className="flex flex-col items-center space-y-4">

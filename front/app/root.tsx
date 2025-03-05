@@ -25,7 +25,6 @@ export const links: Route.LinksFunction = () => [
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
 ];
-
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <Provider store={store}>
@@ -36,10 +35,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <Meta />
           <Links />
         </head>
-        <body>
-          {/* <div className="mt-4">
+        <body
+          className="min-h-screen transition-colors duration-300
+            bg-white text-black dark:bg-gray-900 dark:text-white"
+        >
+          <div className="mt-4">
             <ThemeToggle />
-          </div> */}
+          </div>
           {children}
           <ScrollRestoration />
           <Scripts />
