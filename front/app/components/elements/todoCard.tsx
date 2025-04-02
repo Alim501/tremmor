@@ -43,7 +43,6 @@ export function ToDoCard({ task }: { task: Task }) {
       setMenuOpen(false);
     }
   };
-  console.log(task.cyclesCurrent);
   return (
     <div className="relative max-w-sm rounded-xl overflow-hidden border rounded-lg shadow-sm p-5 cursor-pointer">
       {/* Иконка троеточия */}
@@ -70,26 +69,27 @@ export function ToDoCard({ task }: { task: Task }) {
           </div>
         )}
       </div>
+      <div className="p-3">
+        {/* Статус */}
+        <select
+          value={taskStatus}
+          onChange={handleStatusChange}
+          className={`w-full p-2 my-1 mb-5 border rounded-md ${statusColors[taskStatus]}`}
+        >
+          <option value="to do">To Do</option>
+          <option value="in progress">In Progress</option>
+          <option value="done">Done</option>
+          <option value="canceled">Canceled</option>
+        </select>
 
-      {/* Статус */}
-      <select
-        value={taskStatus}
-        onChange={handleStatusChange}
-        className={`w-full p-2 my-1 mb-5 border rounded-md ${statusColors[taskStatus]}`}
-      >
-        <option value="to do">To Do</option>
-        <option value="in progress">In Progress</option>
-        <option value="done">Done</option>
-        <option value="canceled">Canceled</option>
-      </select>
-
-      {/* Основная информация */}
-      <h2 className="font-bold text-xl mt-2">{task.title}</h2>
-      <h2 className="font-bold text-xl mt-2">
-        {task.cyclesCurrent}/{task.cycles}
-      </h2>
-      <h2 className="font-bold text-xl mt-2">{task.priority?.title}</h2>
-      <h2 className="font-bold text-xl mt-2">{task.category?.title}</h2>
+        {/* Основная информация */}
+        <h2 className="font-bold text-xl mt-2">{task.title}</h2>
+        <h2 className="font-bold text-xl mt-2">
+          {task.cyclesCurrent}/{task.cycles}
+        </h2>
+        <h2 className="font-bold text-xl mt-2">{task.priority?.title}</h2>
+        <h2 className="font-bold text-xl mt-2">{task.category?.title}</h2>
+      </div>
     </div>
   );
 }

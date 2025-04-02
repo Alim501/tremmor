@@ -34,14 +34,16 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable("id") Long id, @RequestBody Category categoryDetails) {
+    public ResponseEntity<Category> updateCategory(@PathVariable("id") Long id, @RequestBody Category categoryDetails,
+            @RequestHeader(value = "X-User-ID", required = false) String userId) {
         return categoryService.updateCategory(id, categoryDetails)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteCategory(@PathVariable("id") Long id,
+            @RequestHeader(value = "X-User-ID", required = false) String userId) {
         if (categoryService.deleteTask(id)) {
             return ResponseEntity.noContent().build();
         }

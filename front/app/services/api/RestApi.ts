@@ -34,7 +34,8 @@ export async function apiFetch<T>(
 
     return { data };
   } catch (error) {
-    return { error: (error as Error).message };
+    console.log(error);
+    return { error: String(error) };
   }
 }
 

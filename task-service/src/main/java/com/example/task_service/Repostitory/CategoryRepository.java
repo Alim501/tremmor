@@ -10,4 +10,5 @@ import com.example.task_service.Entity.Category;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<Category> findByUserId(String userId);
+    
 }

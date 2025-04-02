@@ -72,7 +72,14 @@ export default function NavBar() {
                 </div>
               )}
             </li>
-
+            <li>
+              <Link
+                to="/todo/search"
+                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+              >
+                Search
+              </Link>
+            </li>
             {isAuthenticated && (
               <li>
                 <a

@@ -2,6 +2,7 @@ package com.example.task_service.Service;
 
 import com.example.task_service.Entity.Category;
 import com.example.task_service.Repostitory.CategoryRepository;
+import com.example.task_service.Repostitory.TaskRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CategoryService {
     private final CategoryRepository categoryRepository;
+    private final TaskRepository taskRepository;
 
     public Category createCategory(Category category, String userId) {
         category.setUserId(userId);
@@ -29,16 +31,21 @@ public class CategoryService {
     public Optional<Category> updateCategory(Long id, Category categoryDetails) {
         return categoryRepository.findById(id).map(category -> {
             category.setTitle(categoryDetails.getTitle());
-            category.setUserId(categoryDetails.getUserId());
             return categoryRepository.save(category);
         });
     }
 
     public boolean deleteTask(Long id) {
-        if (categoryRepository.existsById(id)) {
-            categoryRepository.deleteById(id);
-            return true;
+        if (!categoryRepository.existsById(id)) {
+            return false; // Категории не существует
         }
-        return false;
+
+        if (taskRepository.existsByCategory_Id(id)) {
+            throw new IllegalStateException("Нельзя удалить категорию, так как она используется в задачах");
+        }
+
+        categoryRepository.deleteById(id);
+        return true;
     }
+
 }

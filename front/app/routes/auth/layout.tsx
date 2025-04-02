@@ -1,5 +1,5 @@
-import { AuthLayout } from "~/components/layout/authLayout";
+import AuthLayout from "~/components/layout/authLayout";
 
-export default function TodoLayout() {
+export default function AuthWrapper() {
   return <AuthLayout />;
 }

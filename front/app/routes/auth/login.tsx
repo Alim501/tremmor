@@ -1,5 +1,5 @@
 import LoginForm from "~/components/forms/LoginForm";
 
-export default function TodoLayout() {
+export default function Login() {
   return <LoginForm />;
 }

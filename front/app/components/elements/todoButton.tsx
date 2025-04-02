@@ -1,4 +1,5 @@
 import { useState } from "react";
+import styles from "./Button.module.css";
 
 interface TodoButtonProps {
   onClick: () => void;
@@ -17,7 +18,7 @@ export default function TodoButton({ onClick, text, color }: TodoButtonProps) {
   return (
     <button
       onClick={handleClick}
-      className={`px-4 py-2 text-white rounded  bg-${color}-500 `}
+      className={`px-4 py-2 text-white rounded  bg-${color}-500 ${styles.button}`}
     >
       {text}
     </button>

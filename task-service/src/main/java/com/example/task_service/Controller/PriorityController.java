@@ -34,14 +34,19 @@ public class PriorityController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Priority> updatePriority(@PathVariable("id") Long id, @RequestBody Priority priorityDetails) {
+    public ResponseEntity<Priority> updatePriority(
+            @PathVariable("id") Long id,
+            @RequestHeader(value = "X-User-ID", required = false) String userId,
+            @RequestBody Priority priorityDetails) {
         return priorityService.updatePriority(id, priorityDetails)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePriority(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deletePriority(
+            @PathVariable("id") Long id,
+            @RequestHeader(value = "X-User-ID", required = false) String userId) {
         if (priorityService.deletePriority(id)) {
             return ResponseEntity.noContent().build();
         }

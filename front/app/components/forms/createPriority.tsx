@@ -1,58 +1,68 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate } from "react-router";
 import TodoButton from "../elements/todoButton";
 import {
   createPriority,
   getOnePriority,
   updatePriority,
+  deletePriority,
+  fetchPriority,
 } from "~/services/api/PriorityApi";
+import type { Priority } from "~/features/ToDoTasks/dto/Priority";
 
-interface CreatePriorityProps {
-  priorityId?: number;
-}
-export function CreatePriority({ priorityId }: CreatePriorityProps) {
+export function CreatePriority() {
   const navigate = useNavigate();
-
   const [priorityTitle, setPriorityTitle] = useState("");
   const [priorityColor, setPriorityColor] = useState("");
+  const [priorityId, setPriorityId] = useState<number | null>(null);
+  const [priorities, setPriorities] = useState<Priority[]>([]);
 
   useEffect(() => {
-    if (priorityId) {
-      const fetchPriority = async () => {
-        try {
-          const priority = await getOnePriority(Number(priorityId));
-          if (priority) {
-            setPriorityTitle(priority.title);
-            setPriorityColor(priority.color);
-          }
-        } catch (error) {
-          console.error("Failed to fetch priority:", error);
-        }
-      };
+    loadPriorities();
+  }, []);
 
-      fetchPriority();
+  const loadPriorities = async () => {
+    const data = await fetchPriority();
+    if (Array.isArray(data)) {
+      setPriorities(data);
+    } else {
+      setPriorities([]);
     }
-  }, [priorityId]);
+  };
+
+  const handleSelectPriority = async (id: number) => {
+    const priority = await getOnePriority(id);
+    if (priority) {
+      setPriorityTitle(priority.title);
+      setPriorityColor(priority.color);
+      setPriorityId(id);
+    }
+  };
+
+  const handleDeletePriority = async (id: number) => {
+    await deletePriority(id);
+    loadPriorities();
+    if (priorityId === id) {
+      setPriorityTitle("");
+      setPriorityColor("");
+      setPriorityId(null);
+    }
+  };
 
   const handleSubmit = async () => {
     if (priorityTitle.trim()) {
       if (priorityId) {
-        // Редактирование существующего
-        await updatePriority(Number(priorityId), {
+        await updatePriority(priorityId, {
           title: priorityTitle,
           color: priorityColor,
         });
       } else {
-        // Создание нового
-        await createPriority({
-          title: priorityTitle,
-          color: priorityColor,
-        });
+        await createPriority({ title: priorityTitle, color: priorityColor });
       }
-
       setPriorityTitle("");
       setPriorityColor("");
-      navigate("/todo");
+      setPriorityId(null);
+      loadPriorities();
     }
   };
 
@@ -81,6 +91,34 @@ export function CreatePriority({ priorityId }: CreatePriorityProps) {
         color="green"
         onClick={handleSubmit}
       />
+
+      <div className="mt-4">
+        <h3 className="text-lg font-semibold">Priorities</h3>
+        <ul>
+          {priorities.map((priority) => (
+            <li
+              key={priority.id}
+              className="flex justify-between p-2 border rounded-md mt-2"
+            >
+              <span>
+                {priority.title} ({priority.color})
+              </span>
+              <div>
+                <TodoButton
+                  text="Edit"
+                  color="blue"
+                  onClick={() => handleSelectPriority(priority.id)}
+                />
+                <TodoButton
+                  text="Delete"
+                  color="red"
+                  onClick={() => handleDeletePriority(priority.id)}
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

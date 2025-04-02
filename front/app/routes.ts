@@ -13,6 +13,7 @@ export default [
   ]),
   layout("./routes/todo/layout.tsx", [
     route("todo", "./routes/todo/index.tsx"),
+    route("todo/search", "./routes/todo/search.tsx"),
     route("todo/create", "./routes/todo/createTask.tsx"),
     route("todo/edit/:id", "./routes/todo/editTask.tsx"),
     route("todo/create/priority", "./routes/todo/createPriority.tsx"),

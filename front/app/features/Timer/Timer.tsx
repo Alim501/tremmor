@@ -62,7 +62,7 @@ export default function Timer() {
     return "Paused";
   };
 
-  console.log(time, isRunning, isBrake, tasks);
+  // console.log(time, isRunning, isBrake, tasks);
 
   return (
     <div className="flex flex-col items-center space-y-4">
