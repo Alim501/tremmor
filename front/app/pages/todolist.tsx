@@ -9,7 +9,6 @@ export function ToDoList({ tasks }: { tasks: Task[] }) {
       (task) => task.status === "done" || task.status === "canceled"
     ),
   };
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {Object.entries(columns).map(([columnTitle, columnTasks]) => (

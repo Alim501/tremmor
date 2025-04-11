@@ -1,11 +1,12 @@
 package com.example.user_service;
 
-import java.util.Optional;
-
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 
+import com.example.user_service.Entity.User;
+import reactor.core.publisher.Mono;
+
 @Repository
-public interface UserRepository extends MongoRepository<User, String> {
-    Optional<User> findByEmail(String email);
+public interface UserRepository extends ReactiveMongoRepository<User, String> {
+    Mono<User> findByEmail(String email); 
 }

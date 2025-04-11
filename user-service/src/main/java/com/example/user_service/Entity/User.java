@@ -1,4 +1,4 @@
-package com.example.user_service;
+package com.example.user_service.Entity;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -19,4 +19,5 @@ public class User {
 
     @NotNull(message = "Пароль - обязательное значение")
     private String password;
+
 }

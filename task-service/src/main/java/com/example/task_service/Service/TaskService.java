@@ -2,18 +2,17 @@ package com.example.task_service.Service;
 
 import com.example.task_service.Entity.Task;
 import com.example.task_service.Repostitory.TaskRepository;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.Optional;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 @Service
 @RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
 
-    public Task createTask(Task taskDto, String userId) {
+    public Mono<Task> createTask(Task taskDto, String userId) {
         Task task = new Task();
         task.setTitle(taskDto.getTitle());
         task.setStatus(taskDto.getStatus());
@@ -22,35 +21,39 @@ public class TaskService {
         task.setCategory(taskDto.getCategory());
         task.setPriority(taskDto.getPriority());
         task.setUserId(userId);
-        return taskRepository.save(task);
+        return Mono.just(task)
+                   .flatMap(taskRepository::save);
     }
 
-    public List<Task> getAllTasks(String userId) {
+    public Flux<Task> getAllTasks(String userId) {
         return taskRepository.findByUserId(userId);
     }
 
-    public Optional<Task> getTaskById(Long id) {
+    public Mono<Task> getTaskById(Long id) {
         return taskRepository.findById(id);
     }
 
-    public Optional<Task> updateTask(Long id, Task taskDetails, String userId) {
-        return taskRepository.findById(id).map(task -> {
-            task.setTitle(taskDetails.getTitle());
-            task.setStatus(taskDetails.getStatus());
-            task.setCycles(taskDetails.getCycles());
-            task.setCyclesCurrent(taskDetails.getCyclesCurrent());
-            task.setCategory(taskDetails.getCategory());
-            task.setPriority(taskDetails.getPriority());
-            task.setUserId(userId);
-            return taskRepository.save(task);
-        });
+    public Mono<Task> updateTask(Long id, Task taskDetails, String userId) {
+        return taskRepository.findById(id)
+                .flatMap(task -> {
+                    task.setTitle(taskDetails.getTitle());
+                    task.setStatus(taskDetails.getStatus());
+                    task.setCycles(taskDetails.getCycles());
+                    task.setCyclesCurrent(taskDetails.getCyclesCurrent());
+                    task.setCategory(taskDetails.getCategory());
+                    task.setPriority(taskDetails.getPriority());
+                    task.setUserId(userId);
+                    return taskRepository.save(task);
+                });
     }
 
-    public boolean deleteTask(Long id) {
-        if (taskRepository.existsById(id)) {
-            taskRepository.deleteById(id);
-            return true;
-        }
-        return false;
+    public Mono<Boolean> deleteTask(Long id) {
+        return taskRepository.existsById(id)
+                .flatMap(exists -> {
+                    if (!exists) {
+                        return Mono.just(false);
+                    }
+                    return taskRepository.deleteById(id).then(Mono.just(true));
+                });
     }
 }
