@@ -28,7 +28,7 @@ public class TaskClient {
 
     @Autowired
     public TaskClient(WebClient.Builder webClientBuilder) {
-        this.webClient = webClientBuilder.baseUrl("lb://task-service").build();  // URL для task-service
+        this.webClient = webClientBuilder.baseUrl("lb://task-service").build(); 
     }
 
     public Mono<Task[]> getUserTasks(String userId) {

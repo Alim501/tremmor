@@ -21,15 +21,18 @@ public class AuthController {
     @PostMapping("/register")
     public Mono<ResponseEntity<TokenResponse>> register(@RequestBody AuthRequest request) {
         return authService.register(request.getEmail(), request.getPassword())
-                .map(token -> ResponseEntity.ok(new TokenResponse(token)))
-                .onErrorResume(e -> Mono.just(ResponseEntity.badRequest().body(e.getMessage()))); // Обработка ошибок
+                .map(token -> ResponseEntity.ok(new TokenResponse((String) token)))
+                .onErrorResume(e -> Mono.just(
+                        ResponseEntity.badRequest().build()));
     }
 
     @PostMapping("/login")
     public Mono<ResponseEntity<TokenResponse>> login(@RequestBody AuthRequest request) {
         return authService.login(request.getEmail(), request.getPassword())
                 .map(token -> ResponseEntity.ok(new TokenResponse(token)))
-                .onErrorResume(e -> Mono.just(ResponseEntity.status(401).body("Invalid credentials"))); // Обработка ошибок
+                .onErrorResume(e -> Mono.just(
+                        ResponseEntity.badRequest().build())); // Обработка
+                                                               // ошибок
     }
 }
 
@@ -39,8 +42,18 @@ class AuthRequest {
     private String password;
 }
 
-@Data
-@AllArgsConstructor
 class TokenResponse {
     private String token;
+
+    public TokenResponse(String token) {
+        this.token = token;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }

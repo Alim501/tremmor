@@ -14,8 +14,8 @@ public interface TaskRepository extends ReactiveCrudRepository<Task, Long> {
     Flux<Task> findByUserId(String userId);
 
     // Поменяй на реактивный Mono
-    Mono<Boolean> existsByCategory_Id(Long category_id);
+    Mono<Boolean> existsByCategoryId(Long category_id);
 
     // Поменяй на реактивный Mono
-    Mono<Boolean> existsByPriority_Id(Long priority_id);
+    Mono<Boolean> existsByPriorityId(Long priority_id);
 }

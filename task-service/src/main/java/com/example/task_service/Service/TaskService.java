@@ -18,8 +18,8 @@ public class TaskService {
         task.setStatus(taskDto.getStatus());
         task.setCycles(taskDto.getCycles());
         task.setCyclesCurrent(0);
-        task.setCategory(taskDto.getCategory());
-        task.setPriority(taskDto.getPriority());
+        task.setCategoryId(taskDto.getCategoryId());
+        task.setPriorityId(taskDto.getPriorityId());
         task.setUserId(userId);
         return Mono.just(task)
                    .flatMap(taskRepository::save);
@@ -40,8 +40,8 @@ public class TaskService {
                     task.setStatus(taskDetails.getStatus());
                     task.setCycles(taskDetails.getCycles());
                     task.setCyclesCurrent(taskDetails.getCyclesCurrent());
-                    task.setCategory(taskDetails.getCategory());
-                    task.setPriority(taskDetails.getPriority());
+                    task.setCategoryId(taskDetails.getCategoryId());
+                    task.setPriorityId(taskDetails.getPriorityId());
                     task.setUserId(userId);
                     return taskRepository.save(task);
                 });

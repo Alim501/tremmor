@@ -1,18 +1,18 @@
 package com.example.task_service.Entity;
 
 import lombok.*;
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 import jakarta.validation.constraints.NotNull;
 
 
-@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "priority")
+@Builder
+@Table("priority")  // Используем Table из R2DBC
 public class Priority {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Используется автоинкрементное ID
     private Long id;
 
     @NotNull(message = "Название - обязательное значение")
@@ -22,6 +22,5 @@ public class Priority {
     private String color;
 
     @NotNull(message = "User ID - обязательное значение")
-    @Column(name = "user_id")
-    private String userId; // UUID пользователя из MongoDB
+    private String userId;  // ID пользователя
 }

@@ -42,9 +42,9 @@ public class CategoryService {
                         return Mono.just(false); // Категории не существует
                     }
                     return Mono.just(id)  // оборачиваем id в Mono
-                    .flatMap(idVal -> Mono.fromCallable(() -> taskRepository.existsByCategory_Id(idVal)))  // оборачиваем existsByCategory_Id в Mono
+                    .flatMap(idVal -> Mono.fromCallable(() -> taskRepository.existsByCategoryId(idVal)))  // оборачиваем existsByCategory_Id в Mono
                     .flatMap(taskExists -> {
-                        if (taskExists) {
+                        if (taskExists != null) {
                             // Если категория используется в задачах, выбрасываем ошибку
                             return Mono.error(new IllegalStateException("Нельзя удалить категорию, так как она используется в задачах"));
                         }

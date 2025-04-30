@@ -1,18 +1,18 @@
 package com.example.task_service.Entity;
 
 import lombok.*;
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 import jakarta.validation.constraints.NotNull;
 
-@Entity
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "tasks")
+@Table("tasks")  // Используем Table из R2DBC
 public class Task {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull(message = "Название - обязательное значение")
@@ -27,15 +27,9 @@ public class Task {
     @NotNull(message = "Циклы - обязательное значение")
     private int cyclesCurrent;
 
-    @ManyToOne
-    @JoinColumn(name = "priority_id")
-    private Priority priority;
-
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
+    private Long priorityId;  // Применяем ID для связи с Priority
+    private Long categoryId;  // Применяем ID для связи с Category
 
     @NotNull(message = "User ID - обязательное значение")
-    @Column(name = "user_id")
-    private String userId;
+    private String userId;  // ID пользователя
 }
