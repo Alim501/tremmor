@@ -1,0 +1,73 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pgsql
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+
+  eurekaserver:
+    build: ./eurekaserver
+    container_name: eurekaserver
+    ports:
+      - "8761:8761"
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+      - postgres
+      - eurekaserver
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/javaLabUser
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/javaLabUser
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: pgsql
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8761/eureka
+
+  task-service:
+    build: ./task-service
+    container_name: task-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres
+      - eurekaserver
+    environment:
+      SPRING_R2DBC_URL: r2dbc:postgresql://postgres:5432/javaLabTask
+      SPRING_R2DBC_USERNAME: postgres
+      SPRING_R2DBC_PASSWORD: pgsql
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8761/eureka
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eurekaserver
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8761/eureka
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/javaLabUser
+
+volumes:
+  pgdata:
+  mongodata:
